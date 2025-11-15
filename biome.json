@@ -1,5 +1,5 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.1.1/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.3.5/schema.json",
   "vcs": {
     "enabled": false,
     "clientKind": "git",
@@ -14,9 +14,9 @@
       "./*.ts",
       "./*.mts",
       "./*.mjs",
-      "!src-tauri/**"
-    ],
-    "experimentalScannerIgnores": ["dist/", "src-tauri/"]
+      "!src-tauri",
+      "!dist"
+    ]
   },
   "formatter": {
     "enabled": true,
@@ -60,6 +60,9 @@
   "css": {
     "formatter": {
       "quoteStyle": "double"
+    },
+    "parser": {
+      "tailwindDirectives": true
     }
   },
   "javascript": {
