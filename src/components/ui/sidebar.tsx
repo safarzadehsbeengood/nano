@@ -81,7 +81,11 @@ function SidebarProvider({
       const saved = localStorage.getItem(SIDEBAR_WIDTH_STORAGE_KEY);
       if (saved) {
         const parsed = parseFloat(saved);
-        if (!Number.isNaN(parsed) && parsed >= SIDEBAR_MIN_WIDTH && parsed <= SIDEBAR_MAX_WIDTH) {
+        if (
+          !Number.isNaN(parsed) &&
+          parsed >= SIDEBAR_MIN_WIDTH &&
+          parsed <= SIDEBAR_MAX_WIDTH
+        ) {
           return parsed;
         }
       }
@@ -90,7 +94,10 @@ function SidebarProvider({
   });
 
   const setWidth = React.useCallback((newWidth: number) => {
-    const clampedWidth = Math.max(SIDEBAR_MIN_WIDTH, Math.min(SIDEBAR_MAX_WIDTH, newWidth));
+    const clampedWidth = Math.max(
+      SIDEBAR_MIN_WIDTH,
+      Math.min(SIDEBAR_MAX_WIDTH, newWidth),
+    );
     setWidthState(clampedWidth);
     if (typeof window !== "undefined") {
       localStorage.setItem(SIDEBAR_WIDTH_STORAGE_KEY, clampedWidth.toString());
@@ -161,7 +168,17 @@ function SidebarProvider({
       isResizing,
       setIsResizing,
     }),
-    [state, open, setOpen, isMobile, openMobile, toggleSidebar, width, setWidth, isResizing, setIsResizing],
+    [
+      state,
+      open,
+      setOpen,
+      isMobile,
+      openMobile,
+      toggleSidebar,
+      width,
+      setWidth,
+      isResizing,
+    ],
   );
 
   return (
@@ -201,7 +218,8 @@ function Sidebar({
   variant?: "sidebar" | "floating" | "inset";
   collapsible?: "offcanvas" | "icon" | "none";
 }) {
-  const { isMobile, state, openMobile, setOpenMobile, isResizing } = useSidebar();
+  const { isMobile, state, openMobile, setOpenMobile, isResizing } =
+    useSidebar();
 
   if (collapsible === "none") {
     return (
@@ -268,8 +286,9 @@ function Sidebar({
       <div
         data-slot="sidebar-container"
         className={cn(
-          "fixed inset-y-0 z-10 hidden h-svh w-(--sidebar-width) md:flex",
-          !isResizing && "transition-[left,right,width] duration-200 ease-linear",
+          "fixed top-8 bottom-0 z-10 hidden h-[calc(100svh-2rem)] w-(--sidebar-width) md:flex",
+          !isResizing &&
+            "transition-[left,right,width] duration-200 ease-linear",
           side === "left"
             ? "left-0 group-data-[collapsible=offcanvas]:left-[calc(var(--sidebar-width)*-1)]"
             : "right-0 group-data-[collapsible=offcanvas]:right-[calc(var(--sidebar-width)*-1)]",
@@ -358,20 +377,25 @@ function SidebarResizeHandle({
     const handleMouseMove = (e: MouseEvent) => {
       if (!resizeRef.current) return;
 
-      const sidebarElement = resizeRef.current.closest('[data-slot="sidebar-container"]');
+      const sidebarElement = resizeRef.current.closest(
+        '[data-slot="sidebar-container"]',
+      );
       if (!sidebarElement) return;
 
       const sidebarWrapper = sidebarElement.closest('[data-slot="sidebar"]');
       const side = sidebarWrapper?.getAttribute("data-side") ?? "left";
 
       const rect = sidebarElement.getBoundingClientRect();
-      const rootFontSize = parseFloat(getComputedStyle(document.documentElement).fontSize);
-      
+      const rootFontSize = parseFloat(
+        getComputedStyle(document.documentElement).fontSize,
+      );
+
       // For left sidebar: width = mouseX - left
       // For right sidebar: width = right - mouseX
-      const newWidth = side === "right" 
-        ? (rect.right - e.clientX) / rootFontSize
-        : (e.clientX - rect.left) / rootFontSize;
+      const newWidth =
+        side === "right"
+          ? (rect.right - e.clientX) / rootFontSize
+          : (e.clientX - rect.left) / rootFontSize;
 
       setWidth(newWidth);
     };
@@ -391,13 +415,14 @@ function SidebarResizeHandle({
       document.body.style.cursor = "";
       document.body.style.userSelect = "";
     };
-  }, [isResizing, isMobile, state, setWidth]);
+  }, [isResizing, isMobile, state, setWidth, setIsResizing]);
 
   if (isMobile || state === "collapsed") {
     return null;
   }
 
   return (
+    // biome-ignore lint/a11y/noStaticElementInteractions: this is ok
     <div
       ref={resizeRef}
       data-sidebar="resize-handle"

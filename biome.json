@@ -53,7 +53,8 @@
               "metadata",
               "useAuth",
               "useSidebar",
-              "buttonVariants"
+              "buttonVariants",
+              "usePlayer"
             ]
           }
         }

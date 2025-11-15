@@ -2,10 +2,12 @@
 import { Quantico, Roboto } from "next/font/google";
 import "@/styles/globals.css";
 import { AppSidebar } from "@/components/app-sidebar";
+import Player from "@/components/audio-player";
 import { ThemeProvider } from "@/components/theme-provider";
 import TitleBar from "@/components/title-bar";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AuthProvider } from "@/contexts/auth-context";
+import { PlayerProvider } from "@/contexts/player-context";
 
 const quantico = Quantico({
   variable: "--font-quantico",
@@ -33,12 +35,19 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <AuthProvider>
-            <TitleBar />
-            <SidebarProvider className="h-[calc(100svh-2rem)] mt-8 overflow-hidden">
-              <SidebarTrigger />
-              <AppSidebar />
-              <main className="flex-1 overflow-y-auto min-h-0">{children}</main>
-            </SidebarProvider>
+            <PlayerProvider>
+              <TitleBar />
+              <SidebarProvider className="h-[calc(100svh-2rem-80px)] mt-8 overflow-hidden">
+                <SidebarTrigger />
+                <AppSidebar />
+                <main className="flex-1 overflow-y-auto min-h-0">
+                  {children}
+                </main>
+              </SidebarProvider>
+              <div className="fixed bottom-0 left-0 right-0 z-50 border-t bg-background">
+                <Player />
+              </div>
+            </PlayerProvider>
           </AuthProvider>
         </ThemeProvider>
       </body>

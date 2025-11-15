@@ -6,6 +6,7 @@ import { AuthGuard } from "@/components/auth-guard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useAuth } from "@/contexts/auth-context";
 import { supabase } from "@/lib/supabase";
 
 export default function UploadPage() {
@@ -15,6 +16,12 @@ export default function UploadPage() {
     success: boolean;
     message: string;
   } | null>(null);
+
+  const { user } = useAuth();
+
+  if (!user) {
+    return <p>Please log in or sign up.</p>;
+  }
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -40,16 +47,12 @@ export default function UploadPage() {
 
     try {
       const uploadPromises = files.map(async (file) => {
-        // Generate a unique filename with timestamp
-        const fileExt = file.name.split(".").pop();
-        const fileName = `${Date.now()}_${Math.random()
-          .toString(36)
-          .substring(7)}.${fileExt}`;
-        const filePath = `audio-files/${fileName}`;
+        // create file path
+        const filePath = `${user.id}/${file.name}`;
 
         // Upload file to Supabase Storage
         const { error: uploadError } = await supabase.storage
-          .from("audio-files")
+          .from(`audio-files`)
           .upload(filePath, file, {
             cacheControl: "3600",
             upsert: false,
