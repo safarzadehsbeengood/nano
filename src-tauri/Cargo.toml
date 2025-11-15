@@ -1,8 +1,8 @@
 [package]
-name = "nano"
+name = "Nano"
 version = "0.1.0"
 description = "A music streaming app, built with Tauri + NextJS"
-authors = ["you"]
+authors = ["Ryan Safarzadeh"]
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html

@@ -1,6 +1,6 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "nano",
+  "productName": "Nano",
   "version": "0.1.0",
   "identifier": "com.nano.dev",
   "build": {

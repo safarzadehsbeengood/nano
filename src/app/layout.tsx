@@ -1,11 +1,11 @@
 "use client";
 import { Quantico, Roboto } from "next/font/google";
 import "@/styles/globals.css";
-import NavBar from "@/components/NavBar";
-import TitleBar from "@/components/title-bar";
-import { ThemeProvider } from "@/components/theme-provider";
 import { AppSidebar } from "@/components/app-sidebar";
+import { ThemeProvider } from "@/components/theme-provider";
+import TitleBar from "@/components/title-bar";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { AuthProvider } from "@/contexts/auth-context";
 
 const quantico = Quantico({
   variable: "--font-quantico",
@@ -25,23 +25,21 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body
-        className={`${quantico.variable} ${roboto.variable} antialiased`}
-      >
+      <body className={`${quantico.variable} ${roboto.variable} antialiased`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
           enableSystem
           disableTransitionOnChange
         >
-          <TitleBar />
-          <SidebarProvider>
-            <SidebarTrigger />
-            <AppSidebar />
-            <main>
-              {children}
-            </main>
-          </SidebarProvider>
+          <AuthProvider>
+            <TitleBar />
+            <SidebarProvider className="h-[calc(100svh-2rem)] mt-8 overflow-hidden">
+              <SidebarTrigger />
+              <AppSidebar />
+              <main className="flex-1 overflow-y-auto min-h-0">{children}</main>
+            </SidebarProvider>
+          </AuthProvider>
         </ThemeProvider>
       </body>
     </html>
