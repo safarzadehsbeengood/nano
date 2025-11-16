@@ -43,9 +43,7 @@ export function SongCard({ song, className }: SongCardProps) {
       </div>
 
       <div className="flex-1 min-w-0">
-        <h3 className="font-medium truncate text-foreground">
-          {song.name}
-        </h3>
+        <h3 className="font-medium truncate text-foreground">{song.name}</h3>
         {song.duration && (
           <p className="text-sm text-muted-foreground">
             {formatDuration(song.duration)}

@@ -34,7 +34,7 @@ export default function Home() {
             <h2 className="text-4xl sm:text-5xl font-bold leading-tight">
               Your Audio, Anywhere.
             </h2>
-            <p className="text-slate-300 max-w-xl">
+            <p className="max-w-xl">
               Stream your personal music collection with a minimalist player
               built for focus and flow. Upload tracks, build playlists, and pick
               up where you left off.
