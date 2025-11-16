@@ -1,6 +1,6 @@
 "use client";
 
-import { Home, Music3, Search, Settings, Upload } from "lucide-react";
+import { AudioLines, Home, Music3, Settings, Upload } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -22,14 +22,14 @@ const items = [
     icon: Home,
   },
   {
+    title: "Visualizer",
+    url: "/visualizer",
+    icon: AudioLines,
+  },
+  {
     title: "Songs",
     url: "/songs",
     icon: Music3,
-  },
-  {
-    title: "Search",
-    url: "/search",
-    icon: Search,
   },
   {
     title: "Upload",

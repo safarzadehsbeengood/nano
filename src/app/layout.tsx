@@ -38,8 +38,8 @@ export default function RootLayout({
             <PlayerProvider>
               <TitleBar />
               <SidebarProvider className="h-[calc(100svh-2rem-80px)] mt-8 overflow-hidden">
-                <SidebarTrigger />
                 <AppSidebar />
+                <SidebarTrigger />
                 <main className="flex-1 overflow-y-auto min-h-0">
                   {children}
                 </main>

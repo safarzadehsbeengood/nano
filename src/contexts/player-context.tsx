@@ -4,6 +4,7 @@ import { createContext, type ReactNode, useContext, useState } from "react";
 
 export interface Song {
   id: string;
+  index: number;
   name: string;
   url: string;
   filePath: string;

@@ -1,6 +1,6 @@
 "use client";
 
-import { Music, Play } from "lucide-react";
+import { Music, Pause, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { type Song, usePlayer } from "@/contexts/player-context";
 import { cn } from "@/lib/utils";
@@ -11,11 +11,15 @@ interface SongCardProps {
 }
 
 export function SongCard({ song, className }: SongCardProps) {
-  const { currentSong, setCurrentSong } = usePlayer();
-  const isActive = currentSong?.id === song.id;
+  const { currentSong, setCurrentSong, setIsPlaying } = usePlayer();
+  const isActive = currentSong?.index === song.index;
 
   const handlePlay = () => {
     setCurrentSong(song);
+  };
+
+  const handlePause = () => {
+    setIsPlaying(false);
   };
 
   return (
@@ -26,7 +30,7 @@ export function SongCard({ song, className }: SongCardProps) {
         isActive && "bg-accent border-primary",
         className,
       )}
-      onClick={handlePlay}
+      onClick={isActive ? handlePause : handlePlay}
     >
       <div className="flex-shrink-0">
         <div className="size-12 rounded-md bg-muted flex items-center justify-center">
@@ -35,7 +39,9 @@ export function SongCard({ song, className }: SongCardProps) {
       </div>
 
       <div className="flex-1 min-w-0">
-        <h3 className="font-medium truncate text-foreground">{song.name}</h3>
+        <h3 className="font-medium truncate text-foreground">
+          {song.name} ({song.index})
+        </h3>
         {song.duration && (
           <p className="text-sm text-muted-foreground">
             {formatDuration(song.duration)}
@@ -47,13 +53,21 @@ export function SongCard({ song, className }: SongCardProps) {
         <Button
           variant="ghost"
           size="icon"
-          className={cn("size-10", isActive && "text-primary")}
+          className={cn("size-10 cursor-pointer", isActive && "text-primary")}
           onClick={(e) => {
             e.stopPropagation();
-            handlePlay();
+            if (isActive) {
+              handlePause();
+            } else {
+              handlePlay();
+            }
           }}
         >
-          <Play className="size-3" />
+          {isActive ? (
+            <Pause className="size-3" />
+          ) : (
+            <Play className="size-3" />
+          )}
         </Button>
       </div>
     </div>

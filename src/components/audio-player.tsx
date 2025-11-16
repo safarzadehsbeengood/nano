@@ -39,7 +39,7 @@ export default function Player() {
     <div className="bg-background border-t">
       <div className="px-4 pt-3 pb-2">
         <p className="text-sm font-medium text-foreground truncate">
-          {currentSong.name}
+          {currentSong.name} ({currentSong.index})
         </p>
       </div>
       <AudioPlayer

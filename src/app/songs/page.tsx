@@ -35,7 +35,7 @@ export default function SongsPage() {
         // Convert storage files to Song objects
         const songList: Song[] = data
           .filter((file) => file.name && !file.name.startsWith("."))
-          .map((file) => {
+          .map((file, index) => {
             const filePath = `${user.id}/${file.name}`;
             const { data: urlData } = supabase.storage
               .from("audio-files")
@@ -43,6 +43,7 @@ export default function SongsPage() {
 
             return {
               id: filePath,
+              index: index,
               name: file.name,
               url: urlData.publicUrl,
               filePath,
