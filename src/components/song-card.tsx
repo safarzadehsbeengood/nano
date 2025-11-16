@@ -11,15 +11,12 @@ interface SongCardProps {
 }
 
 export function SongCard({ song, className }: SongCardProps) {
-  const { currentSong, setCurrentSong, setIsPlaying } = usePlayer();
-  const isActive = currentSong?.index === song.index;
+  const { currentSong, setCurrentSong, setIsPlaying, isPlaying } = usePlayer();
+  const isSelected = currentSong?.index === song.index;
 
   const handlePlay = () => {
     setCurrentSong(song);
-  };
-
-  const handlePause = () => {
-    setIsPlaying(false);
+    setIsPlaying(true);
   };
 
   return (
@@ -27,10 +24,17 @@ export function SongCard({ song, className }: SongCardProps) {
     <div
       className={cn(
         "group flex items-center gap-4 p-4 rounded-lg border bg-card hover:bg-accent/50 transition-colors cursor-pointer",
-        isActive && "bg-accent border-primary",
+        isSelected && "bg-accent border-primary",
         className,
       )}
-      onClick={isActive ? handlePause : handlePlay}
+      onClick={() => {
+        if (isSelected) {
+          // toggle play/pause for the selected song
+          setIsPlaying(!isPlaying);
+        } else {
+          handlePlay();
+        }
+      }}
     >
       <div className="flex-shrink-0">
         <div className="size-12 rounded-md bg-muted flex items-center justify-center">
@@ -40,7 +44,7 @@ export function SongCard({ song, className }: SongCardProps) {
 
       <div className="flex-1 min-w-0">
         <h3 className="font-medium truncate text-foreground">
-          {song.name} ({song.index})
+          {song.name}
         </h3>
         {song.duration && (
           <p className="text-sm text-muted-foreground">
@@ -53,17 +57,17 @@ export function SongCard({ song, className }: SongCardProps) {
         <Button
           variant="ghost"
           size="icon"
-          className={cn("size-10 cursor-pointer", isActive && "text-primary")}
+          className={cn("size-10 cursor-pointer", isSelected && "text-primary")}
           onClick={(e) => {
             e.stopPropagation();
-            if (isActive) {
-              handlePause();
+            if (isSelected) {
+              setIsPlaying(!isPlaying);
             } else {
               handlePlay();
             }
           }}
         >
-          {isActive ? (
+          {isSelected && isPlaying ? (
             <Pause className="size-3" />
           ) : (
             <Play className="size-3" />

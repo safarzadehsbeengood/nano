@@ -1,12 +1,13 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import AudioPlayer from "react-h5-audio-player";
 import "react-h5-audio-player/lib/styles.css";
 import { usePlayer } from "@/contexts/player-context";
 
 export default function Player() {
-  const { currentSong, setIsPlaying } = usePlayer();
+  const { currentSong, setIsPlaying, isPlaying } = usePlayer();
+  const playerRef = useRef<any>(null);
 
   const handlePlay = () => {
     setIsPlaying(true);
@@ -27,6 +28,26 @@ export default function Player() {
     [currentSong?.id],
   );
 
+  useEffect(() => {
+    if (!playerRef.current) return;
+    //  eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    const audioEl: HTMLMediaElement | undefined =
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      playerRef.current?.audio?.current;
+    if (!audioEl) return;
+
+    if (isPlaying) {
+      const p = audioEl.play();
+      if (typeof p.catch === "function") {
+        p.catch(() => {
+          /* ignore */
+        });
+      }
+    } else {
+      audioEl.pause();
+    }
+  }, [isPlaying]);
+
   if (!currentSong) {
     return (
       <div className="bg-background border-t p-4 flex items-center justify-center text-muted-foreground">
@@ -39,13 +60,14 @@ export default function Player() {
     <div className="bg-background border-t">
       <div className="px-4 pt-3 pb-2">
         <p className="text-sm font-medium text-foreground truncate">
-          {currentSong.name} ({currentSong.index})
+          {currentSong.name}
         </p>
       </div>
       <AudioPlayer
         key={playerKey}
         autoPlay={true}
         src={currentSong.url}
+        ref={playerRef}
         className="bg-background"
         onPlay={handlePlay}
         onPause={handlePause}

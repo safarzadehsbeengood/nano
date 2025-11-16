@@ -32,7 +32,7 @@ export default function Home() {
         <main className="gap-8 items-center">
           <section className="space-y-6">
             <h2 className="text-4xl sm:text-5xl font-bold leading-tight">
-              Cozy listening, anywhere
+              Your Audio, Anywhere.
             </h2>
             <p className="text-slate-300 max-w-xl">
               Stream your personal music collection with a minimalist player
