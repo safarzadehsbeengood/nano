@@ -1,6 +1,6 @@
 "use client";
 
-import { AudioLines, Home, Music3, Settings, Upload } from "lucide-react";
+import { Home, Music3, Settings, Upload } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {

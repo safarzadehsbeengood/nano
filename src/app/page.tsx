@@ -10,7 +10,7 @@ import { supabase } from "@/lib/supabase";
 export default function Home() {
   const { user, loading: authLoading } = useAuth();
   const [songs, setSongs] = useState<Song[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [_loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!user) {
@@ -66,7 +66,6 @@ export default function Home() {
     void fetchSongs();
   }, [user]);
 
-  const recentSongs = songs.slice(0, 6);
   const totalSongs = songs.length;
 
   if (authLoading) {

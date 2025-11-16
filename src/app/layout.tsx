@@ -40,7 +40,7 @@ export default function RootLayout({
               <SidebarProvider className="h-[calc(100svh-2rem-80px)] mt-8 overflow-hidden">
                 <AppSidebar />
                 <SidebarTrigger />
-                <main className="flex-1 overflow-y-auto min-h-0">
+                <main className="flex-1 overflow-y-auto min-h-0 pb-32">
                   {children}
                 </main>
               </SidebarProvider>
