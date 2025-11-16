@@ -75,8 +75,14 @@ function SidebarProvider({
   const isMobile = useIsMobile();
   const [openMobile, setOpenMobile] = React.useState(false);
 
-  // Load saved width from localStorage or use default
-  const [width, setWidthState] = React.useState(() => {
+  // Always start with default width to avoid hydration mismatch
+  // Load saved width from localStorage after mount (client-side only)
+  const [width, setWidthState] = React.useState(() =>
+    parseFloat(SIDEBAR_WIDTH.replace("rem", "")),
+  );
+
+  // Load saved width from localStorage after mount to avoid hydration mismatch
+  React.useEffect(() => {
     if (typeof window !== "undefined") {
       const saved = localStorage.getItem(SIDEBAR_WIDTH_STORAGE_KEY);
       if (saved) {
@@ -86,12 +92,11 @@ function SidebarProvider({
           parsed >= SIDEBAR_MIN_WIDTH &&
           parsed <= SIDEBAR_MAX_WIDTH
         ) {
-          return parsed;
+          setWidthState(parsed);
         }
       }
     }
-    return parseFloat(SIDEBAR_WIDTH.replace("rem", ""));
-  });
+  }, []);
 
   const setWidth = React.useCallback((newWidth: number) => {
     const clampedWidth = Math.max(

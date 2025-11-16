@@ -6,8 +6,10 @@ import "react-h5-audio-player/lib/styles.css";
 import { usePlayer } from "@/contexts/player-context";
 
 export default function Player() {
-  const { currentSong, setIsPlaying, isPlaying } = usePlayer();
+  const { currentSong, setIsPlaying, isPlaying, setCurrentTime, restoredTime } =
+    usePlayer();
   const playerRef = useRef<any>(null);
+  const hasRestoredTime = useRef(false);
 
   const handlePlay = () => {
     setIsPlaying(true);
@@ -28,6 +30,59 @@ export default function Player() {
     [currentSong?.id],
   );
 
+  // Track current time and update context
+  useEffect(() => {
+    if (!playerRef.current) return;
+    //  eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    const audioEl: HTMLMediaElement | undefined =
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      playerRef.current?.audio?.current;
+    if (!audioEl) return;
+
+    const updateTime = () => {
+      setCurrentTime(audioEl.currentTime);
+    };
+
+    audioEl.addEventListener("timeupdate", updateTime);
+    return () => {
+      audioEl.removeEventListener("timeupdate", updateTime);
+    };
+  }, [setCurrentTime]);
+
+  // Reset restoration flag when song changes
+  useEffect(() => {
+    hasRestoredTime.current = false;
+  }, []);
+
+  // Restore time position when song is loaded
+  useEffect(() => {
+    if (!playerRef.current || !currentSong) return;
+    //  eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    const audioEl: HTMLMediaElement | undefined =
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      playerRef.current?.audio?.current;
+    if (!audioEl) return;
+
+    if (restoredTime !== null && !hasRestoredTime.current) {
+      const handleLoadedMetadata = () => {
+        audioEl.currentTime = restoredTime;
+        hasRestoredTime.current = true;
+      };
+
+      if (audioEl.readyState >= 1) {
+        // Metadata already loaded
+        audioEl.currentTime = restoredTime;
+        hasRestoredTime.current = true;
+      } else {
+        audioEl.addEventListener("loadedmetadata", handleLoadedMetadata);
+        return () => {
+          audioEl.removeEventListener("loadedmetadata", handleLoadedMetadata);
+        };
+      }
+    }
+  }, [currentSong, restoredTime]);
+
+  // Handle play/pause
   useEffect(() => {
     if (!playerRef.current) return;
     //  eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
@@ -65,7 +120,7 @@ export default function Player() {
       </div>
       <AudioPlayer
         key={playerKey}
-        autoPlay={true}
+        autoPlay={restoredTime === null}
         src={currentSong.url}
         ref={playerRef}
         className="bg-background"

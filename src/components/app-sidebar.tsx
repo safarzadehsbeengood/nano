@@ -22,11 +22,6 @@ const items = [
     icon: Home,
   },
   {
-    title: "Visualizer",
-    url: "/visualizer",
-    icon: AudioLines,
-  },
-  {
     title: "Songs",
     url: "/songs",
     icon: Music3,
