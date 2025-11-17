@@ -23,36 +23,47 @@ export default function TitleBar() {
       className="fixed top-0 left-0 right-0 h-8 bg-background border-b border-border flex items-center justify-end select-none px-2 z-50 gap-2"
     >
       {user ? (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="size-6">
-              <div className="flex items-center justify-center size-5 rounded-full bg-primary/10 text-primary">
-                <User className="size-3" />
-              </div>
-              <span className="sr-only">User menu</span>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56">
-            <DropdownMenuLabel>
-              <div className="flex flex-col space-y-1">
-                <p className="text-sm font-medium leading-none">{user.email}</p>
-                <p className="text-xs leading-none text-muted-foreground">
-                  {user.id.slice(0, 8)}...
-                </p>
-              </div>
-            </DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem
-              onClick={() => {
-                void signOut();
-              }}
-              className="text-destructive focus:text-destructive"
-            >
-              <LogOut className="size-4" />
-              Sign out
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <div className="flex items-center gap-2">
+          <p className="text-sm font-medium leading-none text-muted-foreground">
+            {user.email}
+          </p>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="size-6 flex items-center justify-center"
+              >
+                <div className="flex items-center justify-center size-5 rounded-full bg-primary/10 text-primary">
+                  <User className="size-3" />
+                </div>
+                <span className="sr-only">User menu</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56">
+              <DropdownMenuLabel>
+                <div className="flex flex-col space-y-1">
+                  <p className="text-sm font-medium leading-none">
+                    {user.email}
+                  </p>
+                  <p className="text-xs leading-none text-muted-foreground">
+                    {user.id.slice(0, 8)}...
+                  </p>
+                </div>
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onClick={() => {
+                  void signOut();
+                }}
+                className="text-destructive focus:text-destructive"
+              >
+                <LogOut className="size-4" />
+                Sign out
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       ) : (
         <Button variant="ghost" size="icon" className="size-6" asChild>
           <Link href="/login">

@@ -6,9 +6,10 @@ import { AuthGuard } from "@/components/auth-guard";
 import { SongCard } from "@/components/song-card";
 import { useAuth } from "@/contexts/auth-context";
 import type { Song } from "@/contexts/player-context";
+import type { AudioFileRow } from "@/hooks/use-supabase-upload";
 import { supabase } from "@/lib/supabase";
 
-export default function SongsPage() {
+export default function LibraryPage() {
   const { user } = useAuth();
   const [songs, setSongs] = useState<Song[]>([]);
   const [loading, setLoading] = useState(true);
@@ -18,38 +19,36 @@ export default function SongsPage() {
 
     const fetchSongs = async () => {
       try {
-        // List all files in the user's folder
-        const { data, error } = await supabase.storage
-          .from("audio-files")
-          .list(user.id, {
-            limit: 100,
-            offset: 0,
-            sortBy: { column: "name", order: "asc" },
-          });
+        // Query database for audio files
+        const { data, error } = await supabase
+          .from("audio_files")
+          .select("*")
+          .eq("user_id", user.id)
+          .order("title", { ascending: true });
 
         if (error) {
           console.error("Error fetching songs:", error);
           return;
         }
 
-        // Convert storage files to Song objects
-        const songList: Song[] = data
-          .filter((file) => file.name && !file.name.startsWith("."))
-          .map((file, index) => {
-            const filePath = `${user.id}/${file.name}`;
+        // Convert database records to Song objects
+        const songList: Song[] = data.map(
+          (record: AudioFileRow, index: number) => {
             const { data: urlData } = supabase.storage
               .from("audio-files")
-              .getPublicUrl(filePath);
+              .getPublicUrl(record.file_path);
 
             return {
-              id: filePath,
+              id: record.id,
               index: index,
-              name: file.name,
+              name: record.title,
               url: urlData.publicUrl,
-              filePath,
-              size: (file.metadata as { size?: number } | null)?.size,
+              filePath: record.file_path,
+              coverArtUrl: record.cover_art_url,
+              duration: record.duration,
             };
-          });
+          },
+        );
 
         setSongs(songList);
       } catch (error) {
@@ -65,17 +64,17 @@ export default function SongsPage() {
   return (
     <AuthGuard>
       <div className="p-12">
-        <h1 className="text-4xl font-semibold mb-4">Your Songs</h1>
+        <h1 className="text-4xl font-semibold mb-4">Your Library</h1>
         {loading ? (
           <div className="flex items-center justify-center py-12">
             <Loader2 className="size-6 animate-spin text-muted-foreground" />
           </div>
         ) : songs.length === 0 ? (
           <p className="text-muted-foreground">
-            No songs found. Upload some songs to get started!
+            No songs found. Upload some songs to your library to get started!
           </p>
         ) : (
-          <div className="space-y-2">
+          <div className="space-y-3">
             {songs.map((song) => (
               <SongCard key={song.id} song={song} />
             ))}

@@ -1,80 +1,36 @@
 "use client";
 
-import { Library, Loader2, Music, Upload } from "lucide-react";
+import { Library, Music, Upload } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "@/contexts/auth-context";
-import type { Song } from "@/contexts/player-context";
+import type { AudioFileRow } from "@/hooks/use-supabase-upload";
 import { supabase } from "@/lib/supabase";
 
 export default function Home() {
-  const { user, loading: authLoading } = useAuth();
-  const [songs, setSongs] = useState<Song[]>([]);
-  const [_loading, setLoading] = useState(true);
+  const { user } = useAuth();
 
-  useEffect(() => {
-    if (!user) {
-      setLoading(false);
+  const [songs, setSongs] = useState<AudioFileRow[]>([]);
+
+  const fetchSongs = useCallback(async () => {
+    const { data, error } = await supabase
+      .from("audio_files")
+      .select("*")
+      .eq("user_id", user?.id)
+      .order("title", { ascending: true });
+
+    if (error) {
+      console.error("Error fetching songs:", error);
       return;
     }
 
-    const fetchSongs = async () => {
-      try {
-        // List all files in the user's folder
-        setLoading(true);
-        const { data, error } = await supabase.storage
-          .from("audio-files")
-          .list(user.id, {
-            limit: 100,
-            offset: 0,
-            sortBy: { column: "name", order: "asc" },
-          });
-
-        if (error) {
-          console.error("Error fetching songs:", error);
-          setLoading(false);
-          return;
-        }
-
-        // Convert storage files to Song objects
-        const songList: Song[] = data
-          .filter((file) => file.name && !file.name.startsWith("."))
-          .map((file, index) => {
-            const filePath = `${user.id}/${file.name}`;
-            const { data: urlData } = supabase.storage
-              .from("audio-files")
-              .getPublicUrl(filePath);
-
-            return {
-              id: filePath,
-              index: index,
-              name: file.name,
-              url: urlData.publicUrl,
-              filePath,
-              size: (file.metadata as { size?: number } | null)?.size,
-            };
-          });
-
-        setSongs(songList);
-      } catch (error) {
-        console.error("Error fetching songs:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    void fetchSongs();
+    setSongs(data as AudioFileRow[]);
   }, [user]);
 
-  const totalSongs = songs.length;
-
-  if (authLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="size-8 animate-spin text-muted-foreground" />
-      </div>
-    );
-  }
+  useEffect(() => {
+    if (!user) return;
+    void fetchSongs();
+  }, [user, fetchSongs]);
 
   return (
     <div className="min-h-screen">
@@ -130,7 +86,7 @@ export default function Home() {
                   Total Songs
                 </h3>
               </div>
-              <p className="text-3xl font-bold">{totalSongs}</p>
+              <p className="text-3xl font-bold">{songs.length}</p>
             </div>
 
             <Link

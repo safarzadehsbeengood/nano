@@ -156,6 +156,10 @@
   border-radius: 0.25rem !important;
 }
 
+.dark .rhap_progress-filled {
+  background-color: gray !important;
+}
+
 .rhap_progress-indicator {
   background-color: var(--primary) !important;
   width: 0.875rem !important;
@@ -207,7 +211,7 @@
 }
 
 .rhap_volume-bar {
-  background-color: var(--muted) !important;
+  background-color: var(--foreground) !important;
   border-radius: 0.25rem !important;
 }
 

@@ -1,15 +1,18 @@
 "use client";
 
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import AudioPlayer from "react-h5-audio-player";
 import "react-h5-audio-player/lib/styles.css";
 import { usePlayer } from "@/contexts/player-context";
+import { supabase } from "@/lib/supabase";
 
 export default function Player() {
   const { currentSong, setIsPlaying, isPlaying, setCurrentTime, restoredTime } =
     usePlayer();
+  // biome-ignore lint: any is fine here
   const playerRef = useRef<any>(null);
   const hasRestoredTime = useRef(false);
+  const [audioUrl, setAudioUrl] = useState<string | null>(null);
 
   const handlePlay = () => {
     setIsPlaying(true);
@@ -29,6 +32,30 @@ export default function Player() {
     () => currentSong?.id ?? "no-song",
     [currentSong?.id],
   );
+
+  // Generate signed URL when song changes
+  useEffect(() => {
+    if (!currentSong) {
+      setAudioUrl(null);
+      return;
+    }
+
+    const generateUrl = async () => {
+      const { data, error } = await supabase.storage
+        .from("audio-files")
+        .createSignedUrl(currentSong.filePath, 3600); // 1 hour expiration
+
+      if (error) {
+        console.error("Error creating signed URL:", error);
+        setAudioUrl(null);
+        return;
+      }
+
+      setAudioUrl(data.signedUrl);
+    };
+
+    void generateUrl();
+  }, [currentSong]);
 
   // Track current time and update context
   useEffect(() => {
@@ -118,17 +145,23 @@ export default function Player() {
           {currentSong.name}
         </p>
       </div>
-      <AudioPlayer
-        key={playerKey}
-        autoPlay={restoredTime === null}
-        src={currentSong.url}
-        ref={playerRef}
-        className="bg-background"
-        onPlay={handlePlay}
-        onPause={handlePause}
-        onEnded={handleEnded}
-        showJumpControls={false}
-      />
+      {audioUrl ? (
+        <AudioPlayer
+          key={playerKey}
+          autoPlay={restoredTime === null}
+          src={audioUrl}
+          ref={playerRef}
+          className="bg-background"
+          onPlay={handlePlay}
+          onPause={handlePause}
+          onEnded={handleEnded}
+          showJumpControls={false}
+        />
+      ) : (
+        <div className="p-4 text-center text-muted-foreground text-sm">
+          Loading audio...
+        </div>
+      )}
     </div>
   );
 }

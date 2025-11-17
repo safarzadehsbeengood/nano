@@ -31,8 +31,8 @@ const SIDEBAR_WIDTH_MOBILE = "18rem";
 const SIDEBAR_WIDTH_ICON = "3rem";
 const SIDEBAR_KEYBOARD_SHORTCUT = "b";
 const SIDEBAR_WIDTH_STORAGE_KEY = "sidebar_width";
-const SIDEBAR_MIN_WIDTH = 12; // rem
-const SIDEBAR_MAX_WIDTH = 32; // rem
+const SIDEBAR_MIN_WIDTH = 8; // rem
+const SIDEBAR_MAX_WIDTH = 16; // rem
 
 interface SidebarContextProps {
   state: "expanded" | "collapsed";

@@ -12,10 +12,10 @@ export interface Song {
   id: string;
   index: number;
   name: string;
-  url: string;
+  url?: string; // Make optional since we'll generate it on demand
   filePath: string;
-  size?: number;
-  duration?: number;
+  coverArtUrl: string;
+  duration: number;
 }
 
 interface CachedSongData {
