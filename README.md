@@ -180,7 +180,7 @@ CREATE POLICY "Authenticated users can upload audio files"
 2. Make it **Public** (so cover art images can be displayed)
 3. Update the bucket policies:
 
-For
+For audio files bucket:
 ```sql
 CREATE POLICY "Authenticated users can upload audio files to their own folder"
   ON storage.objects FOR INSERT
@@ -442,7 +442,7 @@ See [LICENSE](LICENSE) file for details.
 ## Acknowledgments
 
 - Built with [Tauri](https://tauri.app/) and [Next.js](https://nextjs.org/)
-- UI components from [Radix UI](https://www.radix-ui.com/)
+- UI components from [Radix UI](https://www.radix-ui.com/) and [ShadCN](https://ui.shadcn.com/)
 - Icons from [Lucide](https://lucide.dev/)
 
 ## Support
