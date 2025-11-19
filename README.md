@@ -2,7 +2,7 @@
 
 A minimalist music streaming desktop application built with Tauri 2.0 and Next.js 15. Upload, organize, and play your personal music collection with a clean, focused interface.
 
-![Nano Screenshot](public/tauri-nextjs-template-2_screenshot.png)
+![Nano Screenshot](public/home.png)
 
 ## Features
 
