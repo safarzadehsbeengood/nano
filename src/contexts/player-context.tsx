@@ -31,6 +31,9 @@ interface PlayerContextType {
   currentTime: number;
   setCurrentTime: (time: number) => void;
   restoredTime: number | null;
+  playlist: Song[];
+  setPlaylist: (songs: Song[]) => void;
+  playNextSong: () => void;
 }
 
 const PlayerContext = createContext<PlayerContextType | undefined>(undefined);
@@ -42,6 +45,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [restoredTime, setRestoredTime] = useState<number | null>(null);
+  const [playlist, setPlaylist] = useState<Song[]>([]);
 
   // Load last played song from localStorage on mount
   useEffect(() => {
@@ -93,6 +97,25 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const playNextSong = () => {
+    if (!currentSong || playlist.length === 0) {
+      return;
+    }
+
+    // Find the current song's index in the playlist
+    const currentIndex = playlist.findIndex((s) => s.id === currentSong.id);
+    
+    // If current song is found and there's a next song, play it
+    if (currentIndex !== -1 && currentIndex < playlist.length - 1) {
+      const nextSong = playlist[currentIndex + 1];
+      setCurrentSong(nextSong);
+      setIsPlaying(true);
+    } else {
+      // No next song, stop playing
+      setIsPlaying(false);
+    }
+  };
+
   return (
     <PlayerContext.Provider
       value={{
@@ -103,6 +126,9 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
         currentTime,
         setCurrentTime,
         restoredTime,
+        playlist,
+        setPlaylist,
+        playNextSong,
       }}
     >
       {children}

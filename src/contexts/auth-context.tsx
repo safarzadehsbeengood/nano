@@ -10,9 +10,8 @@ interface AuthContextType {
   session: Session | null;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
-  signUp: (email: string, password: string) => Promise<{ error: Error | null }>;
+  signUp: (email: string, password: string, username: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
-  signInWithOAuth: (provider: "google" | "github") => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -59,11 +58,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const signUp = async (email: string, password: string) => {
+  const signUp = async (email: string, password: string, username: string) => {
     try {
       const { error } = await supabase.auth.signUp({
         email,
         password,
+        options: {
+          data: {
+            username,
+          },
+        },
       });
       return { error: error ? new Error(error.message) : null };
     } catch (error) {
@@ -78,18 +82,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     router.push("/");
   };
 
-  const signInWithOAuth = async (provider: "google" | "github") => {
-    const redirectTo = `${window.location.origin}/auth/callback?next=${encodeURIComponent(window.location.pathname)}`;
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider,
-      options: {
-        redirectTo,
-      },
-    });
-    if (error) {
-      console.error("OAuth error:", error);
-    }
-  };
 
   return (
     <AuthContext.Provider
@@ -100,7 +92,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         signIn,
         signUp,
         signOut,
-        signInWithOAuth,
       }}
     >
       {children}

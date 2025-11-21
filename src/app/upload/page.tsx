@@ -17,7 +17,7 @@ export default function UploadPage() {
     bucketName: "audio-files",
     path: user?.id,
     allowedMimeTypes: ["audio/*"],
-    maxFiles: 10,
+    maxFiles: 100,
     maxFileSize: 1000 * 1000 * 50, // 50MB,
     coverArtBucketName: "cover-art", // Extract and upload cover art to this bucket
   });

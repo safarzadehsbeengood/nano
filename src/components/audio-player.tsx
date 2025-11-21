@@ -3,11 +3,11 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import AudioPlayer from "react-h5-audio-player";
 import "react-h5-audio-player/lib/styles.css";
-import { usePlayer } from "@/contexts/player-context";
+import { Song, usePlayer } from "@/contexts/player-context";
 import { supabase } from "@/lib/supabase";
 
 export default function Player() {
-  const { currentSong, setIsPlaying, isPlaying, setCurrentTime, restoredTime } =
+  const { currentSong, setIsPlaying, isPlaying, setCurrentTime, restoredTime, setCurrentSong, playNextSong } =
     usePlayer();
   // biome-ignore lint: any is fine here
   const playerRef = useRef<any>(null);
@@ -23,8 +23,7 @@ export default function Player() {
   };
 
   const handleEnded = () => {
-    setIsPlaying(false);
-    // Optionally, you could auto-play next song here
+    playNextSong();
   };
 
   // Use key prop to force re-render when song changes
@@ -155,7 +154,7 @@ export default function Player() {
           onPlay={handlePlay}
           onPause={handlePause}
           onEnded={handleEnded}
-          showJumpControls={false}
+          showJumpControls={true}
         />
       ) : (
         <div className="p-4 text-center text-muted-foreground text-sm">

@@ -1,8 +1,8 @@
 "use client";
 
-import { Home, Library, Settings, Upload } from "lucide-react";
+import { Home, Library, List, Settings, Upload } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useParams } from "next/navigation";
 import {
   Sidebar,
   SidebarContent,
@@ -25,6 +25,11 @@ const items = [
     title: "Library",
     url: "/library",
     icon: Library,
+  },
+  {
+    title: "Playlists",
+    url: "/playlists",
+    icon: List,
   },
   {
     title: "Upload",

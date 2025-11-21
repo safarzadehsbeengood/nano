@@ -5,12 +5,13 @@ import { useEffect, useState } from "react";
 import { AuthGuard } from "@/components/auth-guard";
 import { SongCard } from "@/components/song-card";
 import { useAuth } from "@/contexts/auth-context";
-import type { Song } from "@/contexts/player-context";
+import { type Song, usePlayer } from "@/contexts/player-context";
 import type { AudioFileRow } from "@/hooks/use-supabase-upload";
 import { supabase } from "@/lib/supabase";
 
 export default function LibraryPage() {
   const { user } = useAuth();
+  const { setPlaylist } = usePlayer();
   const [songs, setSongs] = useState<Song[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -51,6 +52,8 @@ export default function LibraryPage() {
         );
 
         setSongs(songList);
+        // Set the playlist so auto-play can work
+        setPlaylist(songList);
       } catch (error) {
         console.error("Error fetching songs:", error);
       } finally {
@@ -59,7 +62,7 @@ export default function LibraryPage() {
     };
 
     void fetchSongs();
-  }, [user]);
+  }, [user, setPlaylist]);
 
   return (
     <AuthGuard>

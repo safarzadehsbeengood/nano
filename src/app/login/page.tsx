@@ -13,8 +13,10 @@ export default function LoginPage() {
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [username, setUsername] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [showEmailConfirmation, setShowEmailConfirmation] = useState(false);
   const { signIn, signUp } = useAuth();
   const router = useRouter();
 
@@ -24,19 +26,49 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const { error: authError } = isSignUp
-        ? await signUp(email, password)
-        : await signIn(email, password);
+      if (isSignUp) {
+        const trimmedUsername = username.trim();
+        if (!trimmedUsername) {
+          setError("Username is required");
+          setLoading(false);
+          return;
+        }
+        const usernamePattern = /^[a-zA-Z0-9_]+$/;
+        if (!usernamePattern.test(trimmedUsername)) {
+          setError("Username can only contain letters, numbers, and underscores");
+          setLoading(false);
+          return;
+        }
 
-      if (authError) {
-        setError(authError.message);
+        const { error: authError } = await signUp(email, password, trimmedUsername);
+        
+        if (authError) {
+          setError(authError.message);
+        } else {
+          // Show email confirmation message and redirect to login
+          setShowEmailConfirmation(true);
+          setTimeout(() => {
+            setIsSignUp(false);
+            setShowEmailConfirmation(false);
+            setEmail("");
+            setPassword("");
+            setUsername("");
+            setError(null);
+          }, 3000);
+        }
       } else {
-        const redirectTo =
-          typeof window !== "undefined"
-            ? (new URLSearchParams(window.location.search).get("redirect") ??
-              "/")
-            : "/";
-        router.push(redirectTo);
+        const { error: authError } = await signIn(email, password);
+        
+        if (authError) {
+          setError(authError.message);
+        } else {
+          const redirectTo =
+            typeof window !== "undefined"
+              ? (new URLSearchParams(window.location.search).get("redirect") ??
+                "/")
+              : "/";
+          router.push(redirectTo);
+        }
       }
     } catch (err) {
       setError(
@@ -63,6 +95,29 @@ export default function LoginPage() {
 
         <div className="space-y-4">
           <form onSubmit={(e) => void handleSubmit(e)} className="space-y-4">
+            {isSignUp && (
+              <div className="space-y-2">
+                <Label htmlFor="username">Username</Label>
+                <Input
+                  id="username"
+                  type="text"
+                  placeholder="Enter your username"
+                  value={username}
+                  onChange={(e) => {
+                    setUsername(e.target.value);
+                    setError(null);
+                  }}
+                  required
+                  disabled={loading}
+                  pattern="[a-zA-Z0-9_]+"
+                  title="Username can only contain letters, numbers, and underscores"
+                />
+                <p className="text-sm text-muted-foreground">
+                  Only letters, numbers, and underscores are allowed
+                </p>
+              </div>
+            )}
+
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input
@@ -93,6 +148,15 @@ export default function LoginPage() {
                 minLength={6}
               />
             </div>
+
+            {showEmailConfirmation && (
+              <div className="p-4 text-sm text-green-600 bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800 rounded-md space-y-2">
+                <p className="font-medium">Account created successfully!</p>
+                <p>
+                  Please check your email to confirm your account. You&apos;ll be redirected to the login page shortly.
+                </p>
+              </div>
+            )}
 
             {error && (
               <div className="p-3 text-sm text-destructive bg-destructive/10 border border-destructive/20 rounded-md">
