@@ -155,6 +155,8 @@ export default function Player() {
           onPause={handlePause}
           onEnded={handleEnded}
           showJumpControls={true}
+          showSkipControls={true}
+          onClickNext={playNextSong}
         />
       ) : (
         <div className="p-4 text-center text-muted-foreground text-sm">
