@@ -34,6 +34,7 @@ interface PlayerContextType {
   playlist: Song[];
   setPlaylist: (songs: Song[]) => void;
   playNextSong: () => void;
+  playPreviousSong: () => void;
 }
 
 const PlayerContext = createContext<PlayerContextType | undefined>(undefined);
@@ -104,7 +105,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
 
     // Find the current song's index in the playlist
     const currentIndex = playlist.findIndex((s) => s.id === currentSong.id);
-    
+
     // If current song is found and there's a next song, play it
     if (currentIndex !== -1 && currentIndex < playlist.length - 1) {
       const nextSong = playlist[currentIndex + 1];
@@ -112,6 +113,24 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       setIsPlaying(true);
     } else {
       // No next song, stop playing
+      setIsPlaying(false);
+    }
+  };
+
+  const playPreviousSong = () => {
+    if (!currentSong || playlist.length === 0) {
+      return;
+    }
+
+    // Find the current song's index in the playlist
+    const currentIndex = playlist.findIndex((s) => s.id === currentSong.id);
+
+    if (currentIndex !== -1 && currentIndex > 0) {
+      const previousSong = playlist[currentIndex - 1];
+      setCurrentSong(previousSong);
+      setIsPlaying(true);
+    } else {
+      // No previous song, stop playing
       setIsPlaying(false);
     }
   };
@@ -129,6 +148,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
         playlist,
         setPlaylist,
         playNextSong,
+        playPreviousSong,
       }}
     >
       {children}

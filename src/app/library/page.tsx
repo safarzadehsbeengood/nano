@@ -77,7 +77,7 @@ export default function LibraryPage() {
             No songs found. Upload some songs to your library to get started!
           </p>
         ) : (
-          <div className="space-y-3">
+          <div className="">
             {songs.map((song) => (
               <SongCard key={song.id} song={song} />
             ))}

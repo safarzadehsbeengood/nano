@@ -3,16 +3,35 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import AudioPlayer from "react-h5-audio-player";
 import "react-h5-audio-player/lib/styles.css";
-import { Song, usePlayer } from "@/contexts/player-context";
+import {
+  Pause,
+  Play,
+  Repeat,
+  Repeat1,
+  SkipBack,
+  SkipForward,
+  Volume2,
+  VolumeOff,
+} from "lucide-react";
+import Image from "next/image";
+import { usePlayer } from "@/contexts/player-context";
 import { supabase } from "@/lib/supabase";
 
 export default function Player() {
-  const { currentSong, setIsPlaying, isPlaying, setCurrentTime, restoredTime, setCurrentSong, playNextSong } =
-    usePlayer();
+  const {
+    currentSong,
+    setIsPlaying,
+    isPlaying,
+    setCurrentTime,
+    restoredTime,
+    playNextSong,
+    playPreviousSong,
+  } = usePlayer();
   // biome-ignore lint: any is fine here
   const playerRef = useRef<any>(null);
   const hasRestoredTime = useRef(false);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
+  const savedVolume = useRef<number>(1); // Default to full volume (1.0)
 
   const handlePlay = () => {
     setIsPlaying(true);
@@ -56,7 +75,7 @@ export default function Player() {
     void generateUrl();
   }, [currentSong]);
 
-  // Track current time and update context
+  // Track current time and update context, also track volume changes
   useEffect(() => {
     if (!playerRef.current) return;
     //  eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
@@ -69,9 +88,18 @@ export default function Player() {
       setCurrentTime(audioEl.currentTime);
     };
 
+    const updateVolume = () => {
+      savedVolume.current = audioEl.volume;
+    };
+
+    // Restore saved volume
+    audioEl.volume = savedVolume.current;
+
     audioEl.addEventListener("timeupdate", updateTime);
+    audioEl.addEventListener("volumechange", updateVolume);
     return () => {
       audioEl.removeEventListener("timeupdate", updateTime);
+      audioEl.removeEventListener("volumechange", updateVolume);
     };
   }, [setCurrentTime]);
 
@@ -80,7 +108,7 @@ export default function Player() {
     hasRestoredTime.current = false;
   }, []);
 
-  // Restore time position when song is loaded
+  // Restore time position and volume when song is loaded
   useEffect(() => {
     if (!playerRef.current || !currentSong) return;
     //  eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
@@ -89,16 +117,36 @@ export default function Player() {
       playerRef.current?.audio?.current;
     if (!audioEl) return;
 
+    const restoreVolume = () => {
+      audioEl.volume = savedVolume.current;
+    };
+
     if (restoredTime !== null && !hasRestoredTime.current) {
       const handleLoadedMetadata = () => {
         audioEl.currentTime = restoredTime;
+        restoreVolume();
         hasRestoredTime.current = true;
       };
 
       if (audioEl.readyState >= 1) {
         // Metadata already loaded
         audioEl.currentTime = restoredTime;
+        restoreVolume();
         hasRestoredTime.current = true;
+      } else {
+        audioEl.addEventListener("loadedmetadata", handleLoadedMetadata);
+        return () => {
+          audioEl.removeEventListener("loadedmetadata", handleLoadedMetadata);
+        };
+      }
+    } else {
+      // Restore volume even if we're not restoring time
+      const handleLoadedMetadata = () => {
+        restoreVolume();
+      };
+
+      if (audioEl.readyState >= 1) {
+        restoreVolume();
       } else {
         audioEl.addEventListener("loadedmetadata", handleLoadedMetadata);
         return () => {
@@ -139,10 +187,19 @@ export default function Player() {
 
   return (
     <div className="bg-background border-t">
-      <div className="px-4 pt-3 pb-2">
-        <p className="text-sm font-medium text-foreground truncate">
-          {currentSong.name}
-        </p>
+      <div className="pt-2 w-full">
+        <div className="relative overflow-hidden flex flex-row items-center justify-center">
+          <Image
+            className="size-10 rounded-lg"
+            src={currentSong.coverArtUrl}
+            alt={currentSong.name}
+            width={32}
+            height={32}
+          />
+          <p className="text-md ml-2 font-medium text-foreground truncate">
+            {currentSong.name}
+          </p>
+        </div>
       </div>
       {audioUrl ? (
         <AudioPlayer
@@ -150,13 +207,26 @@ export default function Player() {
           autoPlay={restoredTime === null}
           src={audioUrl}
           ref={playerRef}
-          className="bg-background"
+          layout="stacked"
+          // className="bg-background mx-2 rounded-lg flex w-full justify-center items-center"
           onPlay={handlePlay}
           onPause={handlePause}
           onEnded={handleEnded}
-          showJumpControls={true}
+          showJumpControls={false}
           showSkipControls={true}
+          volume={savedVolume.current}
           onClickNext={playNextSong}
+          onClickPrevious={playPreviousSong}
+          customIcons={{
+            next: <SkipForward className="size-8   text-foreground" />,
+            previous: <SkipBack className="size-8 text-foreground" />,
+            loop: <Repeat className="size-4 text-foreground" />,
+            loopOff: <Repeat1 className="size-4 text-foreground" />,
+            volume: <Volume2 className="size-6 text-foreground" />,
+            volumeMute: <VolumeOff className="size-6 text-foreground" />,
+            play: <Play className="size-8 text-foreground" />,
+            pause: <Pause className="size-8 text-foreground" />,
+          }}
         />
       ) : (
         <div className="p-4 text-center text-muted-foreground text-sm">

@@ -2,7 +2,7 @@
 
 import { Home, Library, List, Settings, Upload } from "lucide-react";
 import Link from "next/link";
-import { usePathname, useParams } from "next/navigation";
+import { usePathname } from "next/navigation";
 import {
   Sidebar,
   SidebarContent,

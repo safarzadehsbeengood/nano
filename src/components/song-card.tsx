@@ -60,23 +60,22 @@ export function SongCard({ song, className }: SongCardProps) {
   };
 
   return (
-    // biome-ignore lint: fine
     <div
       className={cn(
-        "group relative flex items-center gap-4 p-3 rounded-xl backdrop-blur-sm h-12",
+        "group relative flex items-center gap-4 p-3 backdrop-blur-sm h-12",
         "hover:bg-accent/50 hover:border-accent-foreground/20 hover:shadow-md",
         isSelected && "bg-primary/5 border-primary/50 shadow-sm",
         className,
       )}
     >
       <div
-        className={`relativeinset-0 opacity-${isSelected ? "100" : "0"} group-hover:opacity-100 duration-50 flex items-center justify-center`}
+        className={`relativeinset-0 opacity-${isSelected ? "100" : "0"} group-hover:opacity-100 flex items-center justify-center`}
       >
         <Button
-          variant="ghost"
+          variant="default"
           size="icon"
           className={cn(
-            "size-10 rounded-2xl bg-transparent hover:bg-transparent flex items-center justify-center",
+            "size-10 rounded-2xl bg-transparent hover:bg-background flex items-center justify-center",
           )}
           onClick={(e) => {
             e.stopPropagation();
@@ -88,9 +87,9 @@ export function SongCard({ song, className }: SongCardProps) {
           }}
         >
           {isSelected && (isPlaying || loadingSong) ? (
-            <Pause className="size-4" />
+            <Pause fill="currentColor" className="size-4 text-foreground" />
           ) : (
-            <Play className="size-4" />
+            <Play fill="currentColor" className="size-4 text-foreground" />
           )}
         </Button>
       </div>

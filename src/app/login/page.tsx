@@ -35,13 +35,19 @@ export default function LoginPage() {
         }
         const usernamePattern = /^[a-zA-Z0-9_]+$/;
         if (!usernamePattern.test(trimmedUsername)) {
-          setError("Username can only contain letters, numbers, and underscores");
+          setError(
+            "Username can only contain letters, numbers, and underscores",
+          );
           setLoading(false);
           return;
         }
 
-        const { error: authError } = await signUp(email, password, trimmedUsername);
-        
+        const { error: authError } = await signUp(
+          email,
+          password,
+          trimmedUsername,
+        );
+
         if (authError) {
           setError(authError.message);
         } else {
@@ -58,7 +64,7 @@ export default function LoginPage() {
         }
       } else {
         const { error: authError } = await signIn(email, password);
-        
+
         if (authError) {
           setError(authError.message);
         } else {
@@ -153,7 +159,8 @@ export default function LoginPage() {
               <div className="p-4 text-sm text-green-600 bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800 rounded-md space-y-2">
                 <p className="font-medium">Account created successfully!</p>
                 <p>
-                  Please check your email to confirm your account. You&apos;ll be redirected to the login page shortly.
+                  Please check your email to confirm your account. You&apos;ll
+                  be redirected to the login page shortly.
                 </p>
               </div>
             )}

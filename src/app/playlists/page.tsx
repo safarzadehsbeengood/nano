@@ -1,8 +1,8 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { AuthGuard } from "@/components/auth-guard";
 import { useAuth } from "@/contexts/auth-context";
-import { useRouter } from "next/navigation";
 
 export default function PlaylistsPage() {
   const { user } = useAuth();
@@ -14,10 +14,10 @@ export default function PlaylistsPage() {
 
   return (
     <AuthGuard>
-    <div>
-      <h1>Playlists</h1>
-      <p>Playlists for {user?.user_metadata.username}</p>
-    </div>
+      <div>
+        <h1>Playlists</h1>
+        <p>Playlists for {user?.user_metadata.username}</p>
+      </div>
     </AuthGuard>
   );
 }
