@@ -22,7 +22,7 @@ serde_json = "1"
 serde = { version = "1", features = ["derive"] }
 tauri = { version = "2", features = ["devtools"] }
 tauri-plugin-opener = "2"
-lofty = "0.19"  # For extracting audio metadata and cover art
+lofty = "0.22"  # For extracting audio metadata and cover art
 base64 = "0.22"  # For encoding image data
 
 [features]
